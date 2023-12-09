@@ -54,7 +54,22 @@ pub fn solve() -> SolutionPair {
         .iter()
         .sum();
 
-    let sol2: i64 = 0;
+    let sol2: i64 = read_to_string("input/days/day09.txt")
+        .expect("Error fetching input file")
+        .split("\n")
+        .map(|r| {
+            parse_into_zeroes(
+                r.split_ascii_whitespace()
+                    .map(|n| n.parse::<i64>().expect("Error trying to parse a number"))
+                    .rev()
+                    .collect::<Vec<i64>>(),
+            )
+            .iter()
+            .fold(0, |acc, curr| acc + curr.last().unwrap_or(&zero))
+        })
+        .collect::<Vec<i64>>()
+        .iter()
+        .sum();
 
     (Solution::from(sol1), Solution::from(sol2))
 }

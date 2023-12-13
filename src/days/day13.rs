@@ -1,10 +1,14 @@
 use itertools::Itertools;
-use rayon::iter::{IntoParallelRefIterator, ParallelBridge, ParallelIterator};
+use rayon::iter::{ParallelBridge, ParallelIterator};
 
 use crate::{Solution, SolutionPair};
 use std::fs::read_to_string;
 
 ///////////////////////////////////////////////////////////////////////////////
+
+fn flip_str(s: &str) -> String {
+    s.chars().rev().collect::<String>()
+}
 
 fn get_diffs(a: &str, b: &str) -> i32 {
     let a = a.chars().collect_vec();
@@ -25,20 +29,13 @@ fn calculate_diffs(map: Vec<&str>, diff_sum: u8) -> u64 {
     for i in 1..map.len() {
         //println!("slice of rows: {}", i);
         let (top, bottom) = map.split_at(i);
-        let mut top = top.iter().rev().collect_vec();
-        let mut bottom = bottom.iter().collect_vec();
-        let max = top.len().min(bottom.len());
-        top.truncate(max);
-        bottom.truncate(max);
+        let top = top.iter().rev().collect_vec();
+        let bottom = bottom.iter().collect_vec();
 
         if top
             .iter()
             .zip(bottom.iter())
-            .map(|(a, b)| {
-                let diffs = get_diffs(a, b);
-                //println!("{} {} {}", a, b, diffs);
-                get_diffs(a, b)
-            })
+            .map(|(top, bottom)| get_diffs(top, bottom))
             .sum::<i32>()
             == diff_sum as i32
         {
@@ -48,13 +45,10 @@ fn calculate_diffs(map: Vec<&str>, diff_sum: u8) -> u64 {
 
     let mut vertical_mirror = 0;
     for i in 1..map[0].len() {
-        //println!("slice of columns: {}", i);
         if map
             .iter()
-            .map(|r| {
-                let (left, right) = r.split_at(i);
-                get_diffs(left.chars().rev().collect::<String>().as_str(), right)
-            })
+            .map(|r| r.split_at(i))
+            .map(|(left, right)| get_diffs(flip_str(left).as_str(), right))
             .sum::<i32>()
             == diff_sum as i32
         {

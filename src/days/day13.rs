@@ -6,11 +6,24 @@ use std::fs::read_to_string;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-fn calculate_reflection_points(map: Vec<String>) -> u64 {
-    let mut mirror_ver = 0;
-    for i in 1..map.len() {
-        println!("{} {}", i, map.len());
+fn get_diffs(a: &str, b: &str) -> i32 {
+    let a = a.chars().collect_vec();
+    let b = b.chars().collect_vec();
+    let max = a.len().min(b.len());
 
+    let mut diffs: i32 = 0;
+    for i in 0..max {
+        if a[i] != b[i] {
+            diffs += 1;
+        }
+    }
+    return diffs;
+}
+
+fn calculate_diffs(map: Vec<&str>, diff_sum: u8) -> u64 {
+    let mut horizontal_mirror = 0;
+    for i in 1..map.len() {
+        //println!("slice of rows: {}", i);
         let (top, bottom) = map.split_at(i);
         let mut top = top.iter().rev().collect_vec();
         let mut bottom = bottom.iter().collect_vec();
@@ -21,54 +34,51 @@ fn calculate_reflection_points(map: Vec<String>) -> u64 {
         if top
             .iter()
             .zip(bottom.iter())
-            .map(|(a, b)| (a.as_str() == b.as_str()))
-            .all(|r| r == true)
+            .map(|(a, b)| {
+                let diffs = get_diffs(a, b);
+                //println!("{} {} {}", a, b, diffs);
+                get_diffs(a, b)
+            })
+            .sum::<i32>()
+            == diff_sum as i32
         {
-            mirror_ver = i;
+            horizontal_mirror = i;
         }
     }
 
-    let mut mirror_hor = 0;
+    let mut vertical_mirror = 0;
     for i in 1..map[0].len() {
-        let reflecting = map
-            .par_iter()
+        //println!("slice of columns: {}", i);
+        if map
+            .iter()
             .map(|r| {
                 let (left, right) = r.split_at(i);
-                let max = left.len().min(right.len());
-
-                let mut left = left.chars().rev().collect_vec();
-                let mut right = right.chars().collect_vec();
-                left.truncate(max);
-                right.truncate(max);
-
-                left.iter()
-                    .zip(right.iter())
-                    .map(|(a, b)| a == b)
-                    .all(|r| r == true)
+                get_diffs(left.chars().rev().collect::<String>().as_str(), right)
             })
-            .all(|r| r == true);
-        if reflecting {
-            mirror_hor = i;
+            .sum::<i32>()
+            == diff_sum as i32
+        {
+            vertical_mirror = i as u64;
         }
     }
 
-    println!("{} {}", mirror_ver, mirror_hor);
-
-    return mirror_ver as u64 * 100 + mirror_hor as u64;
+    return horizontal_mirror as u64 * 100 + vertical_mirror as u64;
 }
 
 pub fn solve() -> SolutionPair {
     let input = read_to_string("input/days/day13.txt").expect("Cannot find the file");
 
-    let sol1: u64 = input
-        .split("\n\n")
-        .par_bridge()
-        .map(|set| {
-            calculate_reflection_points(set.split("\n").map(|r| r.to_string()).collect_vec())
-        })
+    let early_solutions = input.split("\n\n").par_bridge();
+
+    let sol1: u64 = early_solutions
+        .clone()
+        .map(|set| calculate_diffs(set.split("\n").collect_vec(), 0))
         .sum();
 
-    let sol2: u64 = 0;
+    let sol2: u64 = early_solutions
+        .clone()
+        .map(|set| calculate_diffs(set.split("\n").collect_vec(), 1))
+        .sum();
 
     (Solution::from(sol1), Solution::from(sol2))
 }

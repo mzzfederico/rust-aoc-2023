@@ -8,4 +8,5 @@ edition = "2021"
 [dependencies]
 itertools = "0.12.0"
 memoize = "0.4.1"
+pathfinding = "4.6.0"
 rayon = "1.8.0"

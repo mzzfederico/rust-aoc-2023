@@ -1,10 +1,10 @@
-use rayon::iter::IndexedParallelIterator;
 use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 
 use crate::{Solution, SolutionPair};
 use itertools::Itertools;
 
 use std::collections::HashMap;
+use std::fs::read_to_string;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -26,11 +26,11 @@ fn hash(s: &str) -> u32 {
 }
 
 pub fn solve() -> SolutionPair {
-    /* let input_string =
-    read_to_string("input/days/day15.txt").expect("Input file could not be opened"); */
+    let input_string =
+        read_to_string("input/days/day15.txt").expect("Input file could not be opened");
 
-    let input_string = "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7".to_string();
-
+    /* let input_string = "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7".to_string();
+     */
     let operations = input_string.trim().split(',').collect::<Vec<&str>>();
 
     let hashes = operations.par_iter().map(|l| hash(l));
@@ -65,6 +65,16 @@ pub fn solve() -> SolutionPair {
             .parse::<u8>()
             .unwrap_or(0);
 
+        if op_lens_focal == 0 && op_type == OpType::Equal {
+            println!("{op} - type: {op_type:?} - label: {label:?} symbol: {symbol:?}");
+            panic!("Invalid equal operation!");
+        }
+
+        if op_lens_focal != 0 && op_type == OpType::Dash {
+            println!("{op} - type: {op_type:?} - label: {label:?} symbol: {symbol:?}");
+            panic!("Invalid dash operation!");
+        }
+
         match op_type {
             OpType::Dash => {
                 let entry = &mut boxes.entry(hash as u8).or_default();
@@ -96,12 +106,25 @@ pub fn solve() -> SolutionPair {
         let lens_box = boxes.get(&(i as u8));
         sol2 += match lens_box {
             Some(lens_box) => lens_box
-                .par_iter()
+                .iter()
                 .enumerate()
+                .inspect(|(_, (label, _))| {
+                    let local_hash = hash(&label) as u8;
+                    let is_hash_correct = local_hash == i as u8;
+
+                    if !is_hash_correct {
+                        println!(
+                            "Hashes do not match! - {label} - {local_hash} - {i}",
+                            label = label,
+                            local_hash = local_hash,
+                            i = i
+                        );
+                    }
+                })
                 .map(|(slot, (_, focal_length))| (i + 1) * (slot + 1) as u64 * *focal_length as u64)
                 .sum::<u64>(),
             None => 0,
-        }
+        };
     }
 
     (Solution::from(sol1), Solution::from(sol2))

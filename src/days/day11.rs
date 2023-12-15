@@ -23,7 +23,7 @@ fn magnitude(a: &XY, b: &XY) -> u64 {
 
 fn calculate_older_universe(input: String, ratio: u64) -> u64 {
     let origin = input
-        .split("\n")
+        .split('\n')
         .map(|r| {
             r.chars()
                 .map(|c| match c {
@@ -77,11 +77,11 @@ fn calculate_older_universe(input: String, ratio: u64) -> u64 {
         c = 0;
     }
 
-    return remote_galaxies
+    remote_galaxies
         .into_iter()
         .combinations(2)
         .map(|v| magnitude(&v[0], &v[1]))
-        .sum::<u64>();
+        .sum::<u64>()
 }
 
 pub fn solve() -> SolutionPair {

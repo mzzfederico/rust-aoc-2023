@@ -85,29 +85,27 @@ impl Almanac {
                     .split_ascii_whitespace()
                     .map(|s| s.parse::<i64>().unwrap())
                     .collect::<Vec<i64>>();
+            } else if line.contains("map") {
+                if !map_buffer.is_empty() {
+                    layers.push(map_buffer.clone());
+                    map_buffer.clear();
+                }
             } else {
-                if line.contains("map") {
-                    if map_buffer.len() > 0 {
-                        layers.push(map_buffer.clone());
-                        map_buffer.clear();
-                    }
-                } else {
-                    let nums = line
-                        .split_ascii_whitespace()
-                        .map(|i| i.parse::<i64>().unwrap_or_default())
-                        .collect::<Vec<i64>>();
+                let nums = line
+                    .split_ascii_whitespace()
+                    .map(|i| i.parse::<i64>().unwrap_or_default())
+                    .collect::<Vec<i64>>();
 
-                    if nums.len() > 0 {
-                        let destination = nums[0];
-                        let source = nums[1];
-                        let span = nums[2];
+                if !nums.is_empty() {
+                    let destination = nums[0];
+                    let source = nums[1];
+                    let span = nums[2];
 
-                        map_buffer.push(Map {
-                            destination,
-                            source,
-                            span,
-                        });
-                    }
+                    map_buffer.push(Map {
+                        destination,
+                        source,
+                        span,
+                    });
                 }
             }
         }

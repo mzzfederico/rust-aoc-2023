@@ -69,13 +69,13 @@ pub fn solve() -> SolutionPair {
 
     let grid = read_to_string("input/days/day10.txt")
         .expect("Cannot find and split input file")
-        .split("\n")
+        .split('\n')
         .enumerate()
         .map(|(r, line)| {
             line.chars()
                 .enumerate()
                 .inspect(|(c, cell)| {
-                    if cell.to_owned() == 'S' {
+                    if *cell == 'S' {
                         start_pos = (r, *c);
                     }
                 })
@@ -108,7 +108,7 @@ pub fn solve() -> SolutionPair {
         border_points.insert(pos, steps);
         curr_pipe = grid.index(pos.0).index(pos.1);
         dir = match curr_pipe {
-            Pipe::Turn(x) => corner(&dir, &x),
+            Pipe::Turn(x) => corner(&dir, x),
             _ => dir,
         };
         steps += 1;

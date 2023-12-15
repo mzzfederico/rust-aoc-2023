@@ -1,10 +1,10 @@
-use rayon::iter::{IndexedParallelIterator, ParallelBridge};
+use rayon::iter::IndexedParallelIterator;
 use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 
 use crate::{Solution, SolutionPair};
 use itertools::Itertools;
-use std::ops::Index;
-use std::{collections::HashMap, fs::read_to_string};
+
+use std::collections::HashMap;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -19,8 +19,8 @@ fn hash(s: &str) -> u32 {
     for c in s.chars() {
         let ascii = c as u32;
         count += ascii;
-        count = count * 17;
-        count = count % 256;
+        count *= 17;
+        count %= 256;
     }
     count
 }
@@ -63,11 +63,11 @@ pub fn solve() -> SolutionPair {
             .skip(*length + 1)
             .collect::<String>()
             .parse::<u8>()
-            .unwrap_or_else(|_| 0);
+            .unwrap_or(0);
 
         match op_type {
             OpType::Dash => {
-                let entry = &mut boxes.entry(hash as u8).or_insert(Vec::new());
+                let entry = &mut boxes.entry(hash as u8).or_default();
                 let entry: Vec<(String, u8)> = entry
                     .iter()
                     .filter(|x| x.0 != label)
@@ -77,7 +77,7 @@ pub fn solve() -> SolutionPair {
                 boxes.insert(hash as u8, entry.clone());
             }
             OpType::Equal => {
-                let entry = boxes.entry(hash as u8).or_insert(Vec::new());
+                let entry = boxes.entry(hash as u8).or_default();
                 match entry.iter().find_position(|x| x.0 == label) {
                     Some((index, _)) => {
                         entry[index].1 = op_lens_focal;

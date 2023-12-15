@@ -51,7 +51,7 @@ fn score_hand(cards: &Cards, jokers: bool) -> Strength {
     let piles = piles.to_vec();
 
     let piles_total = piles.iter().filter(|x| **x != 0).count();
-    let max_pile = piles.iter().max().unwrap().clone();
+    let max_pile = *piles.iter().max().unwrap();
     let jokers_total = if jokers { piles[9] } else { 0 };
 
     let tuple = (piles_total, max_pile, jokers_total);
@@ -113,7 +113,7 @@ pub fn solve() -> SolutionPair {
     let input = read_to_string("input/days/day07.txt").expect("Cannot read input 07");
 
     let mut hands: Vec<Hand> = input
-        .split("\n")
+        .split('\n')
         .map(|hand| {
             let sides: Vec<&str> = hand.split_ascii_whitespace().collect();
             let cards: String = sides[0].to_string();

@@ -30,8 +30,7 @@ fn gcd_of_two_numbers(a: u64, b: u64) -> u64 {
 pub fn solve() -> SolutionPair {
     let input_text = read_to_string("input/days/day07.txt").expect("Cannot read file!");
     let lines: Vec<String> = input_text
-        .split("\n")
-        .into_iter()
+        .split('\n')
         .map(|x| x.to_string())
         .collect();
 

@@ -7,16 +7,14 @@ pub fn solve() -> SolutionPair {
     let input_file = read_to_string("input/days/day06.txt").expect("Cannot read the input file");
 
     let data = input_file
-        .split("\n")
-        .into_iter()
+        .split('\n')
         .map(|x| {
             return x
                 .to_string()
-                .split(":")
+                .split(':')
                 .nth(1)
                 .expect("Issue splitting up input values")
                 .split_ascii_whitespace()
-                .into_iter()
                 .map(|x| x.parse::<u64>().expect("Issue parsing nums"))
                 .collect::<Vec<u64>>();
         })

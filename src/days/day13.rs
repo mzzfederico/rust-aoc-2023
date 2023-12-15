@@ -21,7 +21,7 @@ fn get_diffs(a: &str, b: &str) -> i32 {
             diffs += 1;
         }
     }
-    return diffs;
+    diffs
 }
 
 fn calculate_diffs(map: Vec<&str>, diff_sum: u8) -> u64 {
@@ -56,7 +56,7 @@ fn calculate_diffs(map: Vec<&str>, diff_sum: u8) -> u64 {
         }
     }
 
-    return horizontal_mirror as u64 * 100 + vertical_mirror as u64;
+    horizontal_mirror as u64 * 100 + vertical_mirror
 }
 
 pub fn solve() -> SolutionPair {
@@ -66,12 +66,12 @@ pub fn solve() -> SolutionPair {
 
     let sol1: u64 = early_solutions
         .clone()
-        .map(|set| calculate_diffs(set.split("\n").collect_vec(), 0))
+        .map(|set| calculate_diffs(set.split('\n').collect_vec(), 0))
         .sum();
 
     let sol2: u64 = early_solutions
         .clone()
-        .map(|set| calculate_diffs(set.split("\n").collect_vec(), 1))
+        .map(|set| calculate_diffs(set.split('\n').collect_vec(), 1))
         .sum();
 
     (Solution::from(sol1), Solution::from(sol2))

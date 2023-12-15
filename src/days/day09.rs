@@ -40,7 +40,7 @@ pub fn solve() -> SolutionPair {
     // Your solution here...
     let sol1: i64 = read_to_string("input/days/day09.txt")
         .expect("Error fetching input file")
-        .split("\n")
+        .split('\n')
         .map(|r| {
             parse_into_zeroes(
                 r.split_ascii_whitespace()
@@ -56,7 +56,7 @@ pub fn solve() -> SolutionPair {
 
     let sol2: i64 = read_to_string("input/days/day09.txt")
         .expect("Error fetching input file")
-        .split("\n")
+        .split('\n')
         .map(|r| {
             parse_into_zeroes(
                 r.split_ascii_whitespace()

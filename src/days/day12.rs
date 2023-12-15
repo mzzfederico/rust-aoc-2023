@@ -18,19 +18,17 @@ enum Spring {
 fn calculate_combinations(springs: Vec<Spring>, nums: Vec<u64>) -> u64 {
     if nums.is_empty() {
         if springs.is_empty() {
-            return 1 as u64;
+            return 1_u64;
+        } else if springs
+            .iter()
+            .all(|c| *c == Spring::Empty || *c == Spring::Unkn)
+        {
+            return 1_u64;
         } else {
-            if springs
-                .iter()
-                .all(|c| *c == Spring::Empty || *c == Spring::Unkn)
-            {
-                return 1 as u64;
-            } else {
-                return 0 as u64;
-            }
+            return 0_u64;
         }
     } else if springs.is_empty() {
-        return 0 as u64;
+        return 0_u64;
     }
 
     let cursor = springs[0];
@@ -39,8 +37,7 @@ fn calculate_combinations(springs: Vec<Spring>, nums: Vec<u64>) -> u64 {
         Spring::Empty => calculate_combinations(
             springs
                 .iter()
-                .skip_while(|c| **c == Spring::Empty)
-                .map(|c| *c)
+                .skip_while(|c| **c == Spring::Empty).copied()
                 .collect_vec(),
             nums,
         ),

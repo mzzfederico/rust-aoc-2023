@@ -75,6 +75,11 @@ pub fn solve() -> SolutionPair {
             panic!("Invalid dash operation!");
         }
 
+        if hash > 255 {
+            println!("{op} - type: {op_type:?} - label: {label:?} symbol: {symbol:?}");
+            panic!("Hash is too damn hight!");
+        }
+
         match op_type {
             OpType::Dash => {
                 let entry = &mut boxes.entry(hash as u8).or_default();

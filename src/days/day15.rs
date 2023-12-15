@@ -38,7 +38,7 @@ pub fn solve() -> SolutionPair {
     // Your solution here...
     let sol1: u32 = hashes.sum();
 
-    let mut boxes: HashMap<u8, Vec<(String, u8)>> = HashMap::new();
+    let mut boxes: HashMap<u64, Vec<(String, u64)>> = HashMap::new();
 
     for op in operations.iter() {
         let label = op
@@ -62,7 +62,7 @@ pub fn solve() -> SolutionPair {
             .chars()
             .skip(*length + 1)
             .collect::<String>()
-            .parse::<u8>()
+            .parse::<u64>()
             .unwrap_or(0);
 
         if op_lens_focal == 0 && op_type == OpType::Equal {
@@ -82,17 +82,17 @@ pub fn solve() -> SolutionPair {
 
         match op_type {
             OpType::Dash => {
-                let entry = &mut boxes.entry(hash as u8).or_default();
-                let entry: Vec<(String, u8)> = entry
+                let entry = &mut boxes.entry(hash as u64).or_default();
+                let entry: Vec<(String, u64)> = entry
                     .iter()
                     .filter(|x| x.0 != label)
                     .map(|l| (l.0.clone(), l.1))
                     .collect();
 
-                boxes.insert(hash as u8, entry.clone());
+                boxes.insert(hash as u64, entry.clone());
             }
             OpType::Equal => {
-                let entry = boxes.entry(hash as u8).or_default();
+                let entry = boxes.entry(hash as u64).or_default();
                 match entry.iter().find_position(|x| x.0 == label) {
                     Some((index, _)) => {
                         entry[index].1 = op_lens_focal;
@@ -107,15 +107,16 @@ pub fn solve() -> SolutionPair {
 
     let mut sol2: u64 = 0;
 
-    for i in 0..255 {
-        let lens_box = boxes.get(&(i as u8));
-        sol2 += match lens_box {
-            Some(lens_box) => lens_box
+    for i in 0..boxes.capacity() {
+        let lens_box = boxes.get(&(i as u64));
+        if lens_box.is_some() {
+            sol2 += lens_box
+                .unwrap()
                 .iter()
                 .enumerate()
                 .inspect(|(_, (label, _))| {
-                    let local_hash = hash(&label) as u8;
-                    let is_hash_correct = local_hash == i as u8;
+                    let local_hash = hash(&label) as u64;
+                    let is_hash_correct = local_hash == i as u64;
 
                     if !is_hash_correct {
                         println!(
@@ -126,9 +127,10 @@ pub fn solve() -> SolutionPair {
                         );
                     }
                 })
-                .map(|(slot, (_, focal_length))| (i + 1) * (slot + 1) as u64 * *focal_length as u64)
-                .sum::<u64>(),
-            None => 0,
+                .map(|(slot, (_, focal_length))| {
+                    (i as u64 + 1) * ((slot + 1) as u64) * (*focal_length as u64)
+                })
+                .sum::<u64>();
         };
     }
 

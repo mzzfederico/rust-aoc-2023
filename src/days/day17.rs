@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use pathfinding::{directed::dijkstra::dijkstra, matrix::Matrix};
 
 use crate::{Solution, SolutionPair};
@@ -19,26 +18,16 @@ type Node = (usize, usize);
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 struct QueueItem {
     node: Node,
-    previous_node: Node,
     direction: Direction,
     dir_count: u32,
-    heat_lost: u32,
 }
 
 impl QueueItem {
-    fn new(
-        node: Node,
-        previous_node: Node,
-        heat_lost: u32,
-        direction: Direction,
-        dir_count: u32,
-    ) -> Self {
+    fn new(node: Node, direction: Direction, dir_count: u32) -> Self {
         Self {
             node,
-            previous_node,
-            heat_lost,
-            dir_count,
             direction,
+            dir_count,
         }
     }
 
@@ -89,8 +78,6 @@ impl QueueItem {
                 Direction::Right => (self.node.0, self.node.1 + 1),
             };
 
-            let heat_cost = grid[next_node];
-
             let mut dir_count = self.dir_count;
             if self.direction == direction {
                 dir_count += 1;
@@ -103,14 +90,8 @@ impl QueueItem {
             }
 
             items.push((
-                QueueItem::new(
-                    next_node,
-                    self.node,
-                    self.heat_lost + heat_cost,
-                    direction,
-                    dir_count,
-                ),
-                heat_cost,
+                QueueItem::new(next_node, direction, dir_count),
+                grid[next_node],
             ));
         }
 
@@ -159,10 +140,8 @@ pub fn solve() -> SolutionPair {
         unvisited.sort_by(|a, b| a.heat_lost.cmp(&b.heat_lost));
     } */
 
-    // Doesn't work either, but does return the correct value for first instance
-
-    /* let min_dist = dijkstra(
-        &QueueItem::new((0, 0), (0, 0), 0, Direction::Right, 1),
+    let min_dist = dijkstra(
+        &QueueItem::new((0, 0), Direction::Down, 1),
         |p| p.find_adjacent_items(&grid),
         |p| p.node == (grid.rows - 1, grid.columns - 1),
     )
@@ -170,8 +149,7 @@ pub fn solve() -> SolutionPair {
 
     println!("{:?}", min_dist);
 
-    let sol1 = min_dist.1; */
-    let sol1 = 0;
+    let sol1 = min_dist.1;
     let sol2: u64 = 0;
 
     (Solution::from(sol1), Solution::from(sol2))

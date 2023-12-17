@@ -1,4 +1,5 @@
-use pathfinding::matrix::Matrix;
+use itertools::Itertools;
+use pathfinding::{directed::dijkstra::dijkstra, matrix::Matrix};
 
 use crate::{Solution, SolutionPair};
 use std::fs::read_to_string;
@@ -15,7 +16,7 @@ enum Direction {
 
 type Node = (usize, usize);
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 struct QueueItem {
     node: Node,
     previous_node: Node,
@@ -41,8 +42,8 @@ impl QueueItem {
         }
     }
 
-    fn find_adjacent_items(self, grid: &Matrix<u32>) -> Vec<Self> {
-        let mut items: Vec<Self> = vec![];
+    fn find_adjacent_items(self, grid: &Matrix<u32>) -> Vec<(Self, u32)> {
+        let mut items: Vec<(Self, u32)> = vec![];
 
         let directions = vec![
             Direction::Up,
@@ -101,12 +102,15 @@ impl QueueItem {
                 continue;
             }
 
-            items.push(QueueItem::new(
-                next_node,
-                self.node,
-                self.heat_lost + heat_cost,
-                direction,
-                dir_count,
+            items.push((
+                QueueItem::new(
+                    next_node,
+                    self.node,
+                    self.heat_lost + heat_cost,
+                    direction,
+                    dir_count,
+                ),
+                heat_cost,
             ));
         }
 
@@ -122,7 +126,7 @@ pub fn solve() -> SolutionPair {
     )
     .expect("Error producing matrix from rows");
 
-    let mut unvisited: Vec<QueueItem> = vec![];
+    /* let mut unvisited: Vec<QueueItem> = vec![];
     let mut visited: Vec<QueueItem> = vec![];
 
     unvisited.push(QueueItem::new((0, 0), (0, 0), 0, Direction::Left, 0));
@@ -153,49 +157,21 @@ pub fn solve() -> SolutionPair {
         }
 
         unvisited.sort_by(|a, b| a.heat_lost.cmp(&b.heat_lost));
-    }
+    } */
 
-    let end = visited
-        .iter()
-        .find(|x| x.node == (grid.rows - 1, grid.columns - 1))
-        .unwrap();
+    // Doesn't work either, but does return the correct value for first instance
 
-    let mut path: Vec<QueueItem> = vec![];
-    let mut cur = end;
+    /* let min_dist = dijkstra(
+        &QueueItem::new((0, 0), (0, 0), 0, Direction::Right, 1),
+        |p| p.find_adjacent_items(&grid),
+        |p| p.node == (grid.rows - 1, grid.columns - 1),
+    )
+    .unwrap();
 
-    while cur.node != (0, 0) {
-        path.push(cur.clone());
-        let prev = visited
-            .iter()
-            .find(|v| v.node == cur.previous_node)
-            .unwrap();
-        cur = prev;
-    }
+    println!("{:?}", min_dist);
 
-    for r in 0..grid.rows {
-        for c in 0..grid.columns {
-            if path.iter().any(|p| p.node == (r, c)) {
-                let v = path.iter().find(|p| p.node == (r, c)).unwrap();
-                print!(
-                    "{}",
-                    match v.direction {
-                        // arrows
-                        Direction::Up => "↑",
-                        Direction::Down => "↓",
-                        Direction::Left => "←",
-                        Direction::Right => "→",
-                    }
-                );
-            } else {
-                print!(".");
-            }
-        }
-        println!();
-    }
-
-    path.iter().for_each(|f| println!("{:?}", f));
-
-    let sol1 = end.heat_lost;
+    let sol1 = min_dist.1; */
+    let sol1 = 0;
     let sol2: u64 = 0;
 
     (Solution::from(sol1), Solution::from(sol2))

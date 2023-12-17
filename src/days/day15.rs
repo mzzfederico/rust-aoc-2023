@@ -115,7 +115,7 @@ pub fn solve() -> SolutionPair {
                 .iter()
                 .enumerate()
                 .inspect(|(_, (label, _))| {
-                    let local_hash = hash(&label) as u64;
+                    let local_hash = hash(label) as u64;
                     let is_hash_correct = local_hash == i as u64;
 
                     if !is_hash_correct {
@@ -128,7 +128,7 @@ pub fn solve() -> SolutionPair {
                     }
                 })
                 .map(|(slot, (_, focal_length))| {
-                    (i as u64 + 1) * ((slot + 1) as u64) * (*focal_length as u64)
+                    (i as u64 + 1) * ((slot + 1) as u64) * *focal_length
                 })
                 .sum::<u64>();
         };

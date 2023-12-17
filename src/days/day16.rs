@@ -47,22 +47,22 @@ impl Photon {
 
             if (self.dir == Dir::L || self.dir == Dir::R) && c == split_ver {
                 return vec![
-                    Self::new(next.clone(), Dir::U),
-                    Self::new(next.clone(), Dir::D),
+                    Self::new(*next, Dir::U),
+                    Self::new(*next, Dir::D),
                 ];
             }
 
             if (self.dir == Dir::U || self.dir == Dir::D) && c == split_hor {
                 return vec![
-                    Self::new(next.clone(), Dir::L),
-                    Self::new(next.clone(), Dir::R),
+                    Self::new(*next, Dir::L),
+                    Self::new(*next, Dir::R),
                 ];
             }
 
-            return vec![Self::new(next.clone(), derive_turn(self.dir, c))];
+            return vec![Self::new(*next, derive_turn(self.dir, c))];
         }
 
-        return vec![];
+        vec![]
     }
 }
 
@@ -93,12 +93,11 @@ fn get_energized_cells(grid: &Matrix<&u8>, first_photon: Photon) -> u64 {
     let mut cells: HashMap<(i64, i64), Dir> = HashMap::new();
     let mut photons: Vec<Photon> = vec![first_photon];
 
-    while &photons.len() > &0 {
+    while !photons.is_empty() {
         // replace with new photons
         photons = photons
             .iter_mut()
-            .map(|p| p.move_on(&grid))
-            .flatten()
+            .flat_map(|p| p.move_on(grid))
             .filter(|p| {
                 // filter out photons that are on the same position
                 match cells.get(&p.pos) {

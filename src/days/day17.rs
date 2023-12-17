@@ -52,6 +52,19 @@ impl QueueItem {
         ];
 
         for direction in directions {
+            if self.direction == Direction::Left && direction == Direction::Right {
+                continue;
+            }
+            if self.direction == Direction::Up && direction == Direction::Down {
+                continue;
+            }
+            if self.direction == Direction::Left && direction == Direction::Right {
+                continue;
+            }
+            if self.direction == Direction::Right && direction == Direction::Left {
+                continue;
+            }
+
             if self.node.0 == 0 && direction == Direction::Up {
                 continue;
             }
@@ -112,13 +125,7 @@ pub fn solve() -> SolutionPair {
     let mut unvisited: Vec<QueueItem> = vec![];
     let mut visited: Vec<QueueItem> = vec![];
 
-    unvisited.push(QueueItem::new(
-        (0, 0),
-        (0, 0),
-        grid[(0, 0)],
-        Direction::Right,
-        1,
-    ));
+    unvisited.push(QueueItem::new((0, 0), (0, 0), 0, Direction::Left, 0));
 
     while !unvisited.is_empty() {
         let current = unvisited.remove(0);
@@ -172,14 +179,15 @@ pub fn solve() -> SolutionPair {
                 print!(
                     "{}",
                     match v.direction {
-                        Direction::Up => "^",
-                        Direction::Down => "v",
-                        Direction::Left => "<",
-                        Direction::Right => ">",
+                        // arrows
+                        Direction::Up => "↑",
+                        Direction::Down => "↓",
+                        Direction::Left => "←",
+                        Direction::Right => "→",
                     }
                 );
             } else {
-                print!("{}", grid[(r, c)]);
+                print!(".");
             }
         }
         println!();

@@ -31,8 +31,34 @@ impl QueueItem {
         }
     }
 
-    fn find_adjacent_items(self, grid: &Matrix<u32>) -> Vec<(Self, u32)> {
+    fn find_adjacent_items(self, grid: &Matrix<u32>, min: u32, max: u32) -> Vec<(Self, u32)> {
         let mut items: Vec<(Self, u32)> = vec![];
+
+        if self.dir_count < min {
+            let dir_count = self.dir_count + 1;
+
+            if self.node.0 == 0 && self.direction == Direction::Up
+                || self.node.0 == grid.rows - 1 && self.direction == Direction::Down
+                || self.node.1 == 0 && self.direction == Direction::Left
+                || self.node.1 == grid.columns - 1 && self.direction == Direction::Right
+            {
+                return items;
+            } else {
+                let next_node = match self.direction {
+                    Direction::Up => (self.node.0 - 1, self.node.1),
+                    Direction::Down => (self.node.0 + 1, self.node.1),
+                    Direction::Left => (self.node.0, self.node.1 - 1),
+                    Direction::Right => (self.node.0, self.node.1 + 1),
+                };
+
+                items.push((
+                    QueueItem::new(next_node, self.direction, dir_count),
+                    grid[next_node],
+                ));
+
+                return items;
+            }
+        }
 
         let directions = vec![
             Direction::Up,
@@ -85,7 +111,7 @@ impl QueueItem {
                 dir_count = 1;
             }
 
-            if dir_count > 3 {
+            if dir_count > max {
                 continue;
             }
 
@@ -142,15 +168,48 @@ pub fn solve() -> SolutionPair {
 
     let min_dist = dijkstra(
         &QueueItem::new((0, 0), Direction::Down, 1),
-        |p| p.find_adjacent_items(&grid),
+        |p| p.find_adjacent_items(&grid, 1, 3),
         |p| p.node == (grid.rows - 1, grid.columns - 1),
     )
     .unwrap();
 
-    println!("{:?}", min_dist);
+    let path = min_dist.0.iter().map(|i| i.node).collect::<Vec<Node>>();
 
-    let sol1 = min_dist.1;
-    let sol2: u64 = 0;
+    for r in 0..grid.rows {
+        for c in 0..grid.columns {
+            if path.contains(&(r, c)) {
+                print!("O");
+            } else {
+                print!("+");
+            }
+        }
+        println!();
+    }
+
+    // ????????
+    let sol1 = min_dist.1 + 1;
+
+    let min_dist_2 = dijkstra(
+        &QueueItem::new((0, 0), Direction::Down, 5),
+        |p| p.find_adjacent_items(&grid, 4, 10),
+        |p| p.node == (grid.rows - 1, grid.columns - 1),
+    )
+    .unwrap();
+
+    let path = min_dist_2.0.iter().map(|i| i.node).collect::<Vec<Node>>();
+
+    for r in 0..grid.rows {
+        for c in 0..grid.columns {
+            if path.contains(&(r, c)) {
+                print!("O");
+            } else {
+                print!("+");
+            }
+        }
+        println!();
+    }
+
+    let sol2 = min_dist_2.1;
 
     (Solution::from(sol1), Solution::from(sol2))
 }

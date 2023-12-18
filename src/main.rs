@@ -18,6 +18,7 @@ use days::day14;
 use days::day15;
 use days::day16;
 use days::day17;
+use days::day18;
 use etc::solution::Solution;
 use std::env;
 use std::time::Instant;
@@ -77,6 +78,7 @@ fn get_day_solver(day: u8) -> fn() -> SolutionPair {
         15 => day15::solve,
         16 => day16::solve,
         17 => day17::solve,
+        18 => day18::solve,
         _ => unimplemented!(),
     }
 }
